@@ -1,3 +1,28 @@
 <resources>
     <string name="app_name">CM20257 Frontend</string>
+    <string name="pleaseLogin">Please login.</string>
+    <string name="welcome">Welcome, %s</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="suggested">Suggested recipe</string>
+    <string name="allRecipes">All Recipes</string>
+    <string name="foodCount">You have %d total food items.</string>
+    <string name="allFoods">All Food Items</string>
+    <string name="unitCount">x %d units</string>
+    <string name="massCount">x %f g</string>
+    <string name="capacityCount">x %f ml</string>
+    <string name="from">From: %s</string>
+    <string name="time">Time: %s</string>
+    <string name="itemName">Item Name</string>
+    <string name="itemMeasurement">Item Measurement</string>
+    <string name="units">units</string>
+    <string name="grams">grams</string>
+    <string name="ml">millilitres</string>
+    <string name="expiration">Expiration date</string>
+    <string name="daysLeft">(%d days left)</string>
+    <string name="modify">Modify</string>
+    <string name="delete">Delete</string>
+    <string name="serverError">A server error occurred.</string>
+    <string name="internalError">An internal error occurred.</string>
 </resources>
