@@ -1,4 +1,22 @@
 <resources>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string-array name="units">
+        <item>Quantity</item>
+        <item>g</item>
+        <item>kg</item>
+        <item>ml</item>
+        <item>l</item>
+    </string-array>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
     <string name="app_name">CM20257 Frontend</string>
     <string name="pleaseLogin">Please login.</string>
     <string name="welcome">Welcome, %s</string>
