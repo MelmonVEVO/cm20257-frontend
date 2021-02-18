@@ -7,7 +7,6 @@
     <string name="previous">Previous</string>
 
     <string-array name="units">
-        <item>Quantity</item>
         <item>g</item>
         <item>kg</item>
         <item>ml</item>
@@ -17,7 +16,7 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
-    <string name="app_name">CM20257 Frontend</string>
+    <string name="app_name">Munch Manager</string>
     <string name="pleaseLogin">Please login.</string>
     <string name="welcome">Welcome, %s</string>
     <string name="username">Username</string>
@@ -43,4 +42,13 @@
     <string name="delete">Delete</string>
     <string name="serverError">A server error occurred.</string>
     <string name="internalError">An internal error occurred.</string>
+    <string name="add">Add</string>
+
+    <string name="item">Item:</string>
+    <string name="itemHint">Name</string>
+    <string name="amount">Amount:</string>
+    <string name="amountHint">Amount (in selected measurement)</string>
+    <string name="expiry">Expiration:</string>
+    <string name="expiryHint">YYYY/MM/DD</string>
+    <string name="noExpiry">No Expiration</string>
 </resources>
