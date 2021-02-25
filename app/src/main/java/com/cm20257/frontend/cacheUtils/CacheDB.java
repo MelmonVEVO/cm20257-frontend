@@ -1,29 +1,25 @@
-package com.cm20257.frontend.foodDB;
+package com.cm20257.frontend.cacheUtils;
 
 import android.content.Context;
 
-import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
-import androidx.sqlite.db.SupportSQLiteDatabase;
-
-import kotlinx.coroutines.CoroutineScope;
 
 @Database(entities = {Food.class}, version = 1)
-abstract class FoodDB extends RoomDatabase {
-    private static volatile FoodDB INSTANCE;
+abstract public class CacheDB extends RoomDatabase {
+    private static volatile CacheDB INSTANCE;
 
-    public abstract FoodCacheDao foodCacheDao();
+    public abstract CacheDao cacheDao();
 
-    public static FoodDB getDB(Context context, CoroutineScope scope) {
+    public static CacheDB getDB(Context context) {
         if (INSTANCE == null) {
-            synchronized (FoodDB.class) {
+            synchronized (CacheDB.class) {
                 INSTANCE = Room.databaseBuilder(
                         context.getApplicationContext(),
-                        FoodDB.class,
-                        "FoodCacheDB"
-                ).build();
+                        CacheDB.class,
+                        "CacheDB"
+                ).allowMainThreadQueries().build(); // allow main thread queries is yabai fix later
             }
         }
         return INSTANCE;

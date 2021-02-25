@@ -17,12 +17,12 @@ import android.view.MenuItem;
 //public class MainActivity extends AppCompatActivity implements addFood.SendDataInterface {
 public class MainActivity extends AppCompatActivity {
 
-    static LinkedList foodList = new LinkedList();
+    //static LinkedList foodList = new LinkedList();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        String[] base = {"base", "123", "Quantity", "2343234"};
-        foodList.add(base);
+        //String[] base = {"base", "123", "Quantity", "2343234"};
+        //foodList.add(base);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);

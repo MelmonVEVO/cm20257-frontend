@@ -1,7 +1,5 @@
 package com.cm20257.frontend;
 
-import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,9 +14,14 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-public class addFood extends Fragment {
+import com.cm20257.frontend.cacheUtils.Food;
 
-    String foodData[];
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
+public class addFood extends Fragment {
 
     @Override
     public View onCreateView(
@@ -39,39 +42,54 @@ public class addFood extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
-        EditText foodNameEt = view.findViewById(R.id.editTextItemName);
-        EditText foodQuantityEt = view.findViewById(R.id.editTextNumber);
-        EditText foodDateEt = view.findViewById(R.id.editTextNumber);
+        EditText foodNameEt = view.findViewById(R.id.editFoodName);
+        EditText foodQuantityEt = view.findViewById(R.id.editFoodQuantity);
+        EditText foodDateEt = view.findViewById(R.id.editExpiryDate);
 
-        CheckBox expDate = view.findViewById(R.id.expDatCheck);
 
         view.findViewById(R.id.addBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                DateFormat df = new SimpleDateFormat("yyyy/MM/dd", Locale.UK);
                 //Retrieve user input and put into array foodInfo
                 String foodName = foodNameEt.getText().toString();
-                String foodQuantity = foodQuantityEt.getText().toString();
-                String foodDate = foodDateEt.getText().toString();
+                Float foodQuantity;
+                try {
+                    foodQuantity = Float.parseFloat(foodQuantityEt.getText().toString());
+                }
+                catch (NumberFormatException ignored) {
+                    foodQuantity = null;
+                }
+                long foodDate;
+                try {
+                    String foodDateText = foodDateEt.getText().toString();
+                    if (!foodDateText.equals("")) {
+                        foodDate = df.parse(foodDateText).getTime();
+                    }
+                    else {
+                        foodDate = 0L;
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    foodDate = -1L;
+                }
                 String unit = spinner.getSelectedItem().toString();
-                Boolean noExpDate = expDate.isChecked();
                 if(foodName.equals("")){
                     Toast toast1 = Toast.makeText(getContext(), "Enter Food Name to Add", Toast.LENGTH_SHORT);
                     toast1.show();
-                } else if(foodQuantity.equals("")) {
+                } else if(foodQuantity == null) {
                     Toast toast2 = Toast.makeText(getContext(), "Enter Food Quantity to Add", Toast.LENGTH_SHORT);
                     toast2.show();
-                } else if((!noExpDate)) {
-                    Toast toast3 = Toast.makeText(getContext(), "Enter Expiration Date to Add", Toast.LENGTH_SHORT);
-                    toast3.show();
+                } else if (foodDate == -1L) {
+                    Toast toast0 = Toast.makeText(getContext(), "Please Enter Valid Date", Toast.LENGTH_SHORT);
+                    toast0.show();
                 } else {
-                    if(!noExpDate && foodDate.equals("")) {
-                        // PACK DATA
-                        foodData = new String[]{foodName, foodQuantity, unit, foodDate};
-                    } else {
-                        foodData = new String[]{foodName, foodQuantity, unit, "NaN"};
-                    }
+                    Bundle result = new Bundle();
 
-                    MainActivity.foodList.add(foodData);
+                    result.putString("name", foodName);
+                    result.putFloat("quantity", foodQuantity);
+                    result.putString("unit", unit);
+                    result.putLong("date", foodDate);
 
                     //RESET WIDGETS
                     foodNameEt.setText("");
@@ -79,6 +97,8 @@ public class addFood extends Fragment {
                     //go back to first fragment
                     NavHostFragment.findNavController(addFood.this)
                             .navigate(R.id.action_SecondFragment_to_FirstFragment);
+
+                    getParentFragmentManager().setFragmentResult("addRequestKey", result);
                 }
             }
         });

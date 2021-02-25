@@ -5,25 +5,50 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentResultListener;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class viewFood extends Fragment implements RcyAdapter.OnItemListener {
+import com.cm20257.frontend.cacheUtils.Food;
+
+import java.util.List;
+
+public class viewFood extends Fragment implements FoodRcyAdapter.OnItemListener {
 
     RecyclerView foodRecycler;
+    FoodRcyAdapter adapter;
+    private FoodViewModel vm;
 //    LinkedList foodList = new LinkedList();
 
     int selectedPositions[] = new int[] {9999};
     int selectedIndex = 0;
 
     View view;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getParentFragmentManager().setFragmentResultListener("addRequestKey", this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                Food created = new Food();
+                created.foodName = result.getString("name");
+                created.quantity = result.getFloat("quantity");
+                created.quantityUnit = result.getString("unit");
+                created.expiration = result.getLong("expiration");
+                vm.insert(created);
+            }
+        });
+    }
 
     @Override
     public View onCreateView(
@@ -37,7 +62,13 @@ public class viewFood extends Fragment implements RcyAdapter.OnItemListener {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
-        listTest(view);
+        //listTest(view);
+
+        foodRecycler = view.findViewById(R.id.foodRecycler);
+        adapter = new FoodRcyAdapter(getActivity(), this);
+        foodRecycler.setAdapter(adapter);
+        foodRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+        foodRecycler.addItemDecoration(new DividerItemDecoration(foodRecycler.getContext(), DividerItemDecoration.VERTICAL));
 
         view.findViewById(R.id.button_first).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,7 +76,7 @@ public class viewFood extends Fragment implements RcyAdapter.OnItemListener {
                 NavHostFragment.findNavController(viewFood.this)
                         .navigate(R.id.action_FirstFragment_to_SecondFragment);
             }
-        });
+        }); // THIS IS WHERE ADDFOOD IS CALLED
 
         view.findViewById(R.id.deleteBtn).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,24 +85,28 @@ public class viewFood extends Fragment implements RcyAdapter.OnItemListener {
                     Toast toast = Toast.makeText(getContext(), "Select Items to Delete", Toast.LENGTH_SHORT);
                     toast.show();
                 } else {
-                    MainActivity.foodList.remove(selectedPositions);
-                    updateRecycler(MainActivity.foodList.get(), view);
+                    //MainActivity.foodList.remove(selectedPositions);
+                    for (int selectedPosition : selectedPositions) {
+                        vm.remove(vm.allFoods.getValue().get(selectedPosition));
+                    }
+                    //updateRecycler(MainActivity.foodList.get(), view);
                     selectedPositions = new int[]{9999};
                     selectedIndex = 0;
                 }
             }
         });
+
+        vm = new ViewModelProvider(this).get(FoodViewModel.class);
+        vm.allFoods.observe(getViewLifecycleOwner(), obs);
     }
 
-    private void listTest(View view){
-        updateRecycler(MainActivity.foodList.get(),view);
-    }
+    //private void listTest(View view){
+    //    updateRecycler(MainActivity.foodList.get(),view);
+    //}
 
     private void updateRecycler(String[][] s1, View view){
-        foodRecycler = view.findViewById(R.id.foodRecycler);
-        RcyAdapter adapter = new RcyAdapter(getActivity(), s1, this);
-        foodRecycler.setAdapter(adapter);
-        foodRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+
     }
 
     public void removeItemFromSelected(int position){
@@ -125,4 +160,12 @@ public class viewFood extends Fragment implements RcyAdapter.OnItemListener {
             removeItemFromSelected(position);
         }
     }
+
+    final Observer<List<Food>> obs = new Observer<List<Food>>() {
+        @Override
+        public void onChanged(List<Food> foods) {
+            adapter.setFood(foods);
+        }
+    };
+
 }

@@ -51,4 +51,7 @@
     <string name="expiry">Expiration:</string>
     <string name="expiryHint">YYYY/MM/DD</string>
     <string name="noExpiry">No Expiration</string>
+    <string name="placeholder">placeholder</string>
+    <string name="quantity">Quantity: %f%s</string>
+    <string name="leaveBlank">Leave blank for no expiry.</string>
 </resources>

@@ -2,77 +2,95 @@ package com.cm20257.frontend;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class RcyAdapter extends RecyclerView.Adapter<RcyAdapter.MyViewHolder>{
+import com.cm20257.frontend.cacheUtils.Food;
 
-    String data1[][];
+import java.util.Collections;
+import java.util.List;
+
+public class FoodRcyAdapter extends RecyclerView.Adapter<FoodRcyAdapter.MyViewHolder>{
+
+    //String data1[][];
+    private List<Food> cache = Collections.emptyList();
     Context context;
+
 
     public int selectedItem;
 
-    private OnItemListener monItemListener;
+    private final OnItemListener monItemListener;
 
-    public RcyAdapter(Context ct, String[][] s1, OnItemListener onItemListener){
+    public FoodRcyAdapter(Context ct, OnItemListener onItemListener){
         context = ct;
-        data1 = s1;
+        //data1 = s1;
         this.monItemListener = onItemListener;
         selectedItem = -1;
     }
 
     @NonNull
     @Override
-    public RcyAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public FoodRcyAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.fooditem, parent, false);
         return new MyViewHolder(view, monItemListener);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull RcyAdapter.MyViewHolder holder, int position) {
-        if(data1[position][2] != null) {
-            holder.myText1.setText(data1[position][0]);
+    public void onBindViewHolder(@NonNull FoodRcyAdapter.MyViewHolder holder, int position) {
+        // old string-based binder
+        /*if(data1[position][2] != null) {
+            holder.foodNameText.setText(data1[position][0]);
             if (data1[position][2].equals("Quantity")) {
-                holder.myText2.setText("Quantity: " + data1[position][1]);
+                holder.foodQuantityText.setText("Quantity: " + data1[position][1]);
             } else {
-                holder.myText2.setText("Quantity: " + data1[position][1] + data1[position][2]);
+                holder.foodQuantityText.setText("Quantity: " + data1[position][1] + data1[position][2]);
             }
         } else {
-            holder.myText1.setText(data1[position][0]);
-            holder.myText2.setText(data1[position][2]);
+            holder.foodNameText.setText(data1[position][0]);
+            holder.foodQuantityText.setText(data1[position][2]);
             holder.selectedCheck.setVisibility(View.GONE);
 
-        }
+        }*/
         //holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.purple_500));
+
+        // new food class-based binder - this will be used once the database system is complete
+        Food current = cache.get(position);
+        holder.foodNameText.setText(current.foodName);
+        holder.foodQuantityText.setText(current.quantity + " " + current.quantityUnit);
 
     }
 
     @Override
     public int getItemCount() {
-        return data1.length;
+        //return data1.length;
+        return cache.size();
+    }
+
+    void setFood(List<Food> food) {
+        this.cache = food;
+        notifyDataSetChanged();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        TextView myText1;
-        TextView myText2;
+        TextView foodNameText;
+        TextView foodQuantityText;
         CheckBox selectedCheck;
         OnItemListener onItemListener;
 
         public MyViewHolder(@NonNull View itemView, OnItemListener onItemListener) {
             super(itemView);
-            myText1 = itemView.findViewById(R.id.foodText);
-            myText2 = itemView.findViewById(R.id.quantityText);
+            foodNameText = itemView.findViewById(R.id.foodText);
+            foodQuantityText = itemView.findViewById(R.id.quantityText);
             selectedCheck = itemView.findViewById(R.id.selectedCheck);
 
             this.onItemListener = onItemListener;
@@ -84,11 +102,7 @@ public class RcyAdapter extends RecyclerView.Adapter<RcyAdapter.MyViewHolder>{
         public void onClick(View v) {
             selectedCheck = itemView.findViewById(R.id.selectedCheck);
             if(selectedCheck.getVisibility() != View.GONE) {
-                if (selectedCheck.isChecked()) {
-                    selectedCheck.setChecked(false);
-                } else {
-                    selectedCheck.setChecked(true);
-                }
+                selectedCheck.setChecked(!selectedCheck.isChecked());
             }
 
             selectedItem = getAdapterPosition();
