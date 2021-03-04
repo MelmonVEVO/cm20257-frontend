@@ -1,4 +1,4 @@
-package com.cm20257.frontend;
+package com.cm20257.frontend.foodList;
 
 class ListNode {
     String[] element;

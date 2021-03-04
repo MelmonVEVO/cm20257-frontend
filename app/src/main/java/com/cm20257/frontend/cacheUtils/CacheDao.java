@@ -21,9 +21,6 @@ public interface CacheDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public void insertNew(Food newFood);
 
-    @Update
-    public void updateExpense(Food[] args);
-
     @Delete
     public void delete(Food food);
 }

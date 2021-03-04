@@ -1,11 +1,10 @@
-package com.cm20257.frontend;
+package com.cm20257.frontend.foodList;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -14,14 +13,14 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.cm20257.frontend.cacheUtils.Food;
+import com.cm20257.frontend.R;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class addFood extends Fragment {
+public class AddFood extends Fragment {
 
     @Override
     public View onCreateView(
@@ -95,7 +94,7 @@ public class addFood extends Fragment {
                     foodNameEt.setText("");
                     spinner.setSelection(0);
                     //go back to first fragment
-                    NavHostFragment.findNavController(addFood.this)
+                    NavHostFragment.findNavController(AddFood.this)
                             .navigate(R.id.action_SecondFragment_to_FirstFragment);
 
                     getParentFragmentManager().setFragmentResult("addRequestKey", result);

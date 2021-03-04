@@ -1,4 +1,4 @@
-package com.cm20257.frontend;
+package com.cm20257.frontend.foodList;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -18,18 +18,19 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.cm20257.frontend.R;
 import com.cm20257.frontend.cacheUtils.Food;
 
 import java.util.List;
 
-public class viewFood extends Fragment implements FoodRcyAdapter.OnItemListener {
+public class ViewFood extends Fragment implements FoodRcyAdapter.OnItemListener {
 
     RecyclerView foodRecycler;
     FoodRcyAdapter adapter;
     private FoodViewModel vm;
 //    LinkedList foodList = new LinkedList();
 
-    int selectedPositions[] = new int[] {9999};
+    int[] selectedPositions = new int[] {9999};
     int selectedIndex = 0;
 
     View view;
@@ -73,18 +74,18 @@ public class viewFood extends Fragment implements FoodRcyAdapter.OnItemListener 
         view.findViewById(R.id.button_first).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NavHostFragment.findNavController(viewFood.this)
+                NavHostFragment.findNavController(ViewFood.this)
                         .navigate(R.id.action_FirstFragment_to_SecondFragment);
             }
         }); // THIS IS WHERE ADDFOOD IS CALLED
 
         view.findViewById(R.id.deleteBtn).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v) { // TODO improve the deletion code
                 if(selectedPositions[0] == 9999){
                     Toast toast = Toast.makeText(getContext(), "Select Items to Delete", Toast.LENGTH_SHORT);
                     toast.show();
-                } else {
+                } else { // delete all selected items
                     //MainActivity.foodList.remove(selectedPositions);
                     for (int selectedPosition : selectedPositions) {
                         vm.remove(vm.allFoods.getValue().get(selectedPosition));
@@ -100,22 +101,12 @@ public class viewFood extends Fragment implements FoodRcyAdapter.OnItemListener 
         vm.allFoods.observe(getViewLifecycleOwner(), obs);
     }
 
-    //private void listTest(View view){
-    //    updateRecycler(MainActivity.foodList.get(),view);
-    //}
-
-    private void updateRecycler(String[][] s1, View view){
-
-
-    }
 
     public void removeItemFromSelected(int position){
         for(int i=0; i<selectedPositions.length; i++){
             if(selectedPositions[i] == position){
                 if (i > 0) {
-                    for (int j=i; j<selectedPositions.length; j++){
-                        selectedPositions[j-1] = selectedPositions[j];
-                    }
+                    System.arraycopy(selectedPositions, i, selectedPositions, i - 1, selectedPositions.length - i);
                 } else {
                     selectedPositions[i] = 9999;
                 }
@@ -130,10 +121,8 @@ public class viewFood extends Fragment implements FoodRcyAdapter.OnItemListener 
             selectedPositions[selectedIndex] = position;
         } else {
             //if not double the length of the selectedPositions array
-            int temp[] = new int[1 + selectedPositions.length];
-            for (int i = 0; i < selectedPositions.length; i++) {
-                temp[i] = selectedPositions[i];
-            }
+            int[] temp = new int[1 + selectedPositions.length];
+            System.arraycopy(selectedPositions, 0, temp, 0, selectedPositions.length);
             selectedPositions = temp;
             selectedPositions[selectedIndex] = position;
         }
@@ -146,9 +135,10 @@ public class viewFood extends Fragment implements FoodRcyAdapter.OnItemListener 
         Log.d("ONCLICKXXX", Integer.toString(position));
 
         int duplicate = 0;
-        for(int i=0; i<selectedPositions.length; i++){
-            if(selectedPositions[i] == position){
+        for (int selectedPosition : selectedPositions) {
+            if (selectedPosition == position) {
                 duplicate = 1;
+                break;
             }
         }
 
