@@ -4,7 +4,7 @@ package com.cm20257.frontend;
  * This is a singleton used to handle the currently logged in user's token
  */
 public class UserHandler {
-    private static UserHandler instance = null;
+    private static final UserHandler INSTANCE = new UserHandler();
     private String token;
     private String username;
 
@@ -13,19 +13,19 @@ public class UserHandler {
     }
 
     public static synchronized String getToken() {
-        return instance.token;
+        return INSTANCE.token;
     }
 
     public static synchronized String getUsername() {
-        return instance.username;
+        return INSTANCE.username;
     }
 
     public static synchronized void setToken(String token) {
-        instance.token = token;
+        INSTANCE.token = token;
     }
 
     public static synchronized void setUsername(String name) {
-        instance.username = name;
+        INSTANCE.username = name;
     }
 
 }

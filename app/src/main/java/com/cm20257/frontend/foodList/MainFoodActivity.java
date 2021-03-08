@@ -10,6 +10,8 @@ import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.Objects;
+
 //public class MainActivity extends AppCompatActivity implements addFood.SendDataInterface {
 public class MainFoodActivity extends AppCompatActivity {
 
@@ -23,6 +25,8 @@ public class MainFoodActivity extends AppCompatActivity {
         setContentView(R.layout.activity_viewfoodmain);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
     @Override

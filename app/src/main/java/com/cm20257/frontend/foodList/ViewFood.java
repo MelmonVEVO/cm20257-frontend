@@ -18,17 +18,20 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.cm20257.frontend.R;
 import com.cm20257.frontend.cacheUtils.Food;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ViewFood extends Fragment implements FoodRcyAdapter.OnItemListener {
 
     RecyclerView foodRecycler;
     FoodRcyAdapter adapter;
     private FoodViewModel vm;
-//    LinkedList foodList = new LinkedList();
+    RequestQueue queue = Volley.newRequestQueue(requireActivity());
 
     int[] selectedPositions = new int[] {9999};
     int selectedIndex = 0;
@@ -158,4 +161,9 @@ public class ViewFood extends Fragment implements FoodRcyAdapter.OnItemListener 
         }
     };
 
+    public void refreshFood() {
+        String getFoodUrl = "http://localhost:8080/account/food";
+        
+
+    }
 }

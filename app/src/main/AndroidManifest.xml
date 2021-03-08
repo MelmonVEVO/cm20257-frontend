@@ -3,15 +3,21 @@
     package="com.cm20257.frontend">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 
     <application
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.CM20257Frontend">
-        <activity android:name=".foodList.MainFoodActivity" />
-        <activity android:name=".mainPage.MainActivity" />
+        <activity
+            android:name=".mainPage.MainActivity" />
+        <activity
+            android:name=".foodList.MainFoodActivity"
+            android:parentActivityName=".mainPage.MainActivity"/>
         <activity android:name=".mainPage.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
