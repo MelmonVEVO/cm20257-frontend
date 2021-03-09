@@ -4,12 +4,13 @@ package com.cm20257.frontend;
  * This is a singleton used to handle the currently logged in user's token
  */
 public class UserHandler {
-    private static UserHandler instance = null;
+    private static final UserHandler instance = new UserHandler();
     private String token;
     private String username;
 
     UserHandler() {
         token = "";
+        username = "";
     }
 
     public static synchronized String getToken() {

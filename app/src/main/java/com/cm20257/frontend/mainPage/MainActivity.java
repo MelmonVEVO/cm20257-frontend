@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import com.cm20257.frontend.R;
 import com.cm20257.frontend.foodList.AddFood;
@@ -17,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main2);
     }
 
-    private void goToFoodScreen() {
+    public void goToFoodScreen(View v) {
         Intent intent = new Intent(this, MainFoodActivity.class);
         startActivity(intent);
     }

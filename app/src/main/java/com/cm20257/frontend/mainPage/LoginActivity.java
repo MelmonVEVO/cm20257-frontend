@@ -9,9 +9,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.cm20257.frontend.R;
 import com.cm20257.frontend.UserHandler;
 
@@ -57,13 +59,13 @@ public class LoginActivity extends AppCompatActivity {
 
     public void login(View v) throws JSONException {
         if (checkData()) {
-            //RequestQueue queue = Volley.newRequestQueue(this);
-            String loginServerUrl = "http://localhost:8080/account/login";
+            RequestQueue queue = Volley.newRequestQueue(this);
+            String loginServerUrl = "http://192.168.1.16:8080/account/login";
 
             JSONObject loginDetails = new JSONObject();
             loginDetails.put("username", emailText.getText().toString());
             loginDetails.put("password", passwordText.getText().toString());
-            JsonObjectRequest loginRequest = new JsonObjectRequest(Request.Method.POST, loginServerUrl, null, new Response.Listener<JSONObject>() {
+            JsonObjectRequest loginRequest = new JsonObjectRequest(Request.Method.POST, loginServerUrl, loginDetails, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
@@ -88,6 +90,7 @@ public class LoginActivity extends AppCompatActivity {
                     return params;
                 }
             };
+            queue.add(loginRequest);
         }
     }
 

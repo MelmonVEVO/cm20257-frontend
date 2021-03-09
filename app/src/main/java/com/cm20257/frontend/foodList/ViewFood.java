@@ -151,6 +151,11 @@ public class ViewFood extends Fragment implements FoodRcyAdapter.OnItemListener 
         }
     }
 
+    public void refreshFood() {
+        String getFoodUrl = "http://192.168.1.16:8080/account/food";
+
+    }
+
     final Observer<List<Food>> obs = new Observer<List<Food>>() {
         @Override
         public void onChanged(List<Food> foods) {
