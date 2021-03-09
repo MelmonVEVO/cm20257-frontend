@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -13,13 +12,11 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.cm20257.frontend.R;
 import com.cm20257.frontend.UserHandler;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -37,7 +34,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         passwordText = findViewById(R.id.passwordInput);
-        emailText = findViewById(R.id.emailInput);
+        emailText = findViewById(R.id.userInput);
     }
 
     private boolean checkData() {
@@ -78,6 +75,8 @@ public class LoginActivity extends AppCompatActivity {
                         goToMainScreen();
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        Toast t = Toast.makeText(getParent().getApplicationContext(), "A network error occurred.", Toast.LENGTH_LONG);
+                        t.show();
                     }
                 }
             }, new Response.ErrorListener() {

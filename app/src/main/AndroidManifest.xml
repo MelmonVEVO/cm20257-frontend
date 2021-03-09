@@ -15,15 +15,19 @@
         android:theme="@style/Theme.CM20257Frontend">
         <activity
             android:name=".mainPage.MainActivity" />
+
         <activity
             android:name=".foodList.MainFoodActivity"
-            android:parentActivityName=".mainPage.MainActivity"/>
-        <activity android:name=".mainPage.LoginActivity">
+            android:parentActivityName=".mainPage.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity android:name=".mainPage.LoginActivity">
+
         </activity>
     </application>
 
