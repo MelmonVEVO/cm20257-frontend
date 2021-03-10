@@ -10,7 +10,7 @@
         android:id="@+id/textView5"
         android:layout_width="333dp"
         android:layout_height="12dp"
-        android:text="TEMPORARY MAIN PAGE WILL BE IMPROVED LMao"
+        android:text="Temporary layout. Remind me to improve."
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
