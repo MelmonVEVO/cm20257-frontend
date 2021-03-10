@@ -18,10 +18,25 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
 import com.cm20257.frontend.R;
+import com.cm20257.frontend.UserHandler;
 import com.cm20257.frontend.cacheUtils.Food;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ViewFood extends Fragment implements FoodRcyAdapter.OnItemListener {
 
@@ -42,6 +57,7 @@ public class ViewFood extends Fragment implements FoodRcyAdapter.OnItemListener 
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
                 Food created = new Food();
+                created.uid = result.getInt("id");
                 created.foodName = result.getString("name");
                 created.quantity = result.getFloat("quantity");
                 created.quantityUnit = result.getString("unit");
@@ -77,7 +93,7 @@ public class ViewFood extends Fragment implements FoodRcyAdapter.OnItemListener 
                 NavHostFragment.findNavController(ViewFood.this)
                         .navigate(R.id.action_FirstFragment_to_SecondFragment);
             }
-        }); // THIS IS WHERE ADDFOOD IS CALLED
+        }); // This is where AddFood is called
 
         view.findViewById(R.id.deleteBtn).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,9 +110,17 @@ public class ViewFood extends Fragment implements FoodRcyAdapter.OnItemListener 
                     selectedPositions = new int[]{9999};
                     selectedIndex = 0;
                 }
+
+                // TODO add code to delete a food item from the server
             }
         });
 
+        view.findViewById(R.id.refreshBtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refreshFood();
+            }
+        });
         vm = new ViewModelProvider(this).get(FoodViewModel.class);
         vm.allFoods.observe(getViewLifecycleOwner(), obs);
     }
@@ -153,7 +177,45 @@ public class ViewFood extends Fragment implements FoodRcyAdapter.OnItemListener 
 
     public void refreshFood() {
         String getFoodUrl = "http://192.168.1.16:8080/account/food";
+        RequestQueue queue = Volley.newRequestQueue(getActivity());
 
+        JsonArrayRequest foodRequest = new JsonArrayRequest(Request.Method.GET, getFoodUrl, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                for (int i = 0; i < response.length(); i++) {
+                    JSONObject handled;
+                    SimpleDateFormat jsonDF = new SimpleDateFormat("dd-MM-yy");
+                    try {
+                        handled = response.getJSONObject(i);
+                        long date = jsonDF.parse(handled.getString("expiryDate")).getTime();
+                        Food toAdd = new Food();
+                        toAdd.uid = handled.getInt("id");
+                        toAdd.foodName = handled.getString("name");
+                        toAdd.quantity = Float.parseFloat(handled.getString("quantity"));
+                        toAdd.quantityUnit = handled.getString("quantityType");
+                        toAdd.expiration = date;
+                        vm.insert(toAdd);
+                    } catch (JSONException | ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() { // this is for putting headers in the request
+                Map<String, String> params = new HashMap<>();
+                params.put("Content-Type", "application/json");
+                params.put("token", UserHandler.getToken());
+                return params;
+            }
+        };
+
+        queue.add(foodRequest);
     }
 
     final Observer<List<Food>> obs = new Observer<List<Food>>() {

@@ -36,6 +36,7 @@
     <string name="expiration">Expiration date</string>
     <string name="daysLeft">(%d days left)</string>
     <string name="modify">Modify</string>
+    <string name="refresh">Refresh</string>
     <string name="delete">Delete</string>
     <string name="serverError">A server error occurred.</string>
     <string name="internalError">An internal error occurred.</string>

@@ -18,7 +18,7 @@ abstract public class CacheDB extends RoomDatabase {
                 INSTANCE = Room.databaseBuilder(
                         context.getApplicationContext(),
                         CacheDB.class,
-                        "CacheDB"
+                        "Cache_DB"
                 ).allowMainThreadQueries().build(); // allow main thread queries is yabai fix later
             }
         }

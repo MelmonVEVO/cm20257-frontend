@@ -72,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
                         String token = response.getString("token");
                         UserHandler.setToken(token);
                         UserHandler.setUsername(emailText.getText().toString());
-                        goToMainScreen();
+                        goToMainScreen(); // TODO prevent users from going back to the login screen
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -84,8 +84,8 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }) {
                 @Override
-                public Map<String, String> getHeaders() {
-                    Map<String, String> params = new HashMap<String, String>();
+                public Map<String, String> getHeaders() { // this is for putting headers in the request
+                    Map<String, String> params = new HashMap<>();
                     params.put("Content-Type", "application/json");
                     return params;
                 }

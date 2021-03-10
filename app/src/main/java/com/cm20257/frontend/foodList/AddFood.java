@@ -13,12 +13,25 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.cm20257.frontend.R;
+import com.cm20257.frontend.UserHandler;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class AddFood extends Fragment {
 
@@ -86,9 +99,54 @@ public class AddFood extends Fragment {
                     Bundle result = new Bundle();
 
                     result.putString("name", foodName);
-                    result.putFloat("quantity", foodQuantity);
+                    result.putFloat("quantity", foodQuantity.intValue());
                     result.putString("unit", unit);
                     result.putLong("date", foodDate);
+
+                    // post the data to the server
+                    String addFoodUrl = "http://192.168.1.16:8080/account/add-food";
+                    RequestQueue queue = Volley.newRequestQueue(getActivity());
+
+                    SimpleDateFormat jsonDF = new SimpleDateFormat("dd-MM-yy");
+                    JSONObject foodRequestDetails = new JSONObject();
+                    try {
+                        foodRequestDetails.put("name", foodName);
+                        foodRequestDetails.put("quantity", foodQuantity);
+                        foodRequestDetails.put("quantityType", unit);
+                        foodRequestDetails.put("expiryDate", jsonDF.format(new Date(foodDate)));
+                        //int foodID;
+                        JsonObjectRequest loginRequest = new JsonObjectRequest(Request.Method.POST, addFoodUrl, foodRequestDetails, new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                try {
+                                    System.out.println("TEST");
+                                    int foodID = response.getInt("id");
+                                    result.putInt("id", foodID);
+                                    getParentFragmentManager().setFragmentResult("addRequestKey", result);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                error.printStackTrace();
+                            }
+                        }) {
+                            @Override
+                            public Map<String, String> getHeaders() { // this is for putting headers in the request
+                                Map<String, String> params = new HashMap<>();
+                                params.put("Content-Type", "application/json");
+                                params.put("token", UserHandler.getToken());
+                                return params;
+                            }
+                        };
+                        queue.add(loginRequest);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
 
                     //RESET WIDGETS
                     foodNameEt.setText("");
@@ -97,7 +155,7 @@ public class AddFood extends Fragment {
                     NavHostFragment.findNavController(AddFood.this)
                             .navigate(R.id.action_SecondFragment_to_FirstFragment);
 
-                    getParentFragmentManager().setFragmentResult("addRequestKey", result);
+
                 }
             }
         });
