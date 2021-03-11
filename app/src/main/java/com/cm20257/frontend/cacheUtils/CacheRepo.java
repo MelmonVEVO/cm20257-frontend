@@ -11,4 +11,4 @@ public class CacheRepo {
     synchronized void insert(Food food) {
         dao.insertNew(food);
     }
-}
+} // this can be removed

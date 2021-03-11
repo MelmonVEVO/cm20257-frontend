@@ -16,11 +16,23 @@ import io.reactivex.Completable;
 public interface CacheDao {
     // food DB requests
     @Query("SELECT * FROM food_cache ORDER BY food_name ASC")
-    public LiveData<List<Food>> getAllFood();
+    LiveData<List<Food>> getAllFood();
 
+    // add a new thing
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insertNew(Food newFood);
+    void insertNew(Food newFood);
 
+    // get rid of one thing
     @Delete
-    public void delete(Food food);
+    void delete(Food food);
+
+    // only use this in special circumstances (e.g. refreshing the cache)
+    @Query("DELETE FROM food_cache")
+    void deleteAll();
+
+    // filter out expired food with a given (long) date
+    @Query("SELECT * FROM food_cache WHERE expiration > :date")
+    LiveData<List<Food>> getNonExpiredFood(long date);
+
 }
+

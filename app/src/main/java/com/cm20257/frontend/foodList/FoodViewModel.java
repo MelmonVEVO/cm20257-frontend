@@ -27,4 +27,8 @@ public class FoodViewModel extends AndroidViewModel {
     public FoodViewModel(@NonNull Application application) {
         super(application);
     }
+
+    public void deleteAll() {
+        dao.deleteAll();
+    }
 }

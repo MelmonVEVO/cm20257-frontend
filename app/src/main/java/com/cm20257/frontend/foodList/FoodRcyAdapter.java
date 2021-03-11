@@ -14,24 +14,24 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.cm20257.frontend.R;
 import com.cm20257.frontend.cacheUtils.Food;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
 
 public class FoodRcyAdapter extends RecyclerView.Adapter<FoodRcyAdapter.MyViewHolder>{
 
-    //String data1[][];
     private List<Food> cache = Collections.emptyList();
     Context context;
 
 
     public int selectedItem;
 
-    private final OnItemListener monItemListener;
+    private final OnItemListener onItemListener;
 
     public FoodRcyAdapter(Context ct, OnItemListener onItemListener){
         context = ct;
-        //data1 = s1;
-        this.monItemListener = onItemListener;
+        this.onItemListener = onItemListener;
         selectedItem = -1;
     }
 
@@ -40,38 +40,21 @@ public class FoodRcyAdapter extends RecyclerView.Adapter<FoodRcyAdapter.MyViewHo
     public FoodRcyAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.fooditem, parent, false);
-        return new MyViewHolder(view, monItemListener);
+        return new MyViewHolder(view, onItemListener);
     }
 
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull FoodRcyAdapter.MyViewHolder holder, int position) {
-        // old string-based binder
-        /*if(data1[position][2] != null) {
-            holder.foodNameText.setText(data1[position][0]);
-            if (data1[position][2].equals("Quantity")) {
-                holder.foodQuantityText.setText("Quantity: " + data1[position][1]);
-            } else {
-                holder.foodQuantityText.setText("Quantity: " + data1[position][1] + data1[position][2]);
-            }
-        } else {
-            holder.foodNameText.setText(data1[position][0]);
-            holder.foodQuantityText.setText(data1[position][2]);
-            holder.selectedCheck.setVisibility(View.GONE);
-
-        }*/
-        //holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.purple_500));
-
-        // new food class-based binder - this will be used once the database system is complete
+        DateFormat df = DateFormat.getDateInstance();
         Food current = cache.get(position);
         holder.foodNameText.setText(current.foodName);
         holder.foodQuantityText.setText(current.quantity + " " + current.quantityUnit);
-
+        holder.foodDateText.setText(df.format(current.expiration));
     }
 
     @Override
     public int getItemCount() {
-        //return data1.length;
         return cache.size();
     }
 
@@ -80,10 +63,10 @@ public class FoodRcyAdapter extends RecyclerView.Adapter<FoodRcyAdapter.MyViewHo
         notifyDataSetChanged();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView foodNameText;
         TextView foodQuantityText;
+        TextView foodDateText;
         CheckBox selectedCheck;
         OnItemListener onItemListener;
 
@@ -91,6 +74,7 @@ public class FoodRcyAdapter extends RecyclerView.Adapter<FoodRcyAdapter.MyViewHo
             super(itemView);
             foodNameText = itemView.findViewById(R.id.foodText);
             foodQuantityText = itemView.findViewById(R.id.quantityText);
+            foodDateText = itemView.findViewById(R.id.dateText);
             selectedCheck = itemView.findViewById(R.id.selectedCheck);
 
             this.onItemListener = onItemListener;
@@ -100,6 +84,7 @@ public class FoodRcyAdapter extends RecyclerView.Adapter<FoodRcyAdapter.MyViewHo
         @SuppressLint("ResourceAsColor")
         @Override
         public void onClick(View v) {
+            // This inverts the checkbox when a food item is clicked.
             selectedCheck = itemView.findViewById(R.id.selectedCheck);
             if(selectedCheck.getVisibility() != View.GONE) {
                 selectedCheck.setChecked(!selectedCheck.isChecked());

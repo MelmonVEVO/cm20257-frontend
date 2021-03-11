@@ -44,6 +44,7 @@ public class AddFood extends Fragment {
         return inflater.inflate(R.layout.add_food, container, false);
     }
 
+    // Here be dragons.
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 

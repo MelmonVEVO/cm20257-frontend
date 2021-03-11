@@ -11,7 +11,6 @@ import com.cm20257.frontend.foodList.AddFood;
 import com.cm20257.frontend.foodList.MainFoodActivity;
 
 public class MainActivity extends AppCompatActivity {
-    // TODO improve main activity generally and integrate the recipe page
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

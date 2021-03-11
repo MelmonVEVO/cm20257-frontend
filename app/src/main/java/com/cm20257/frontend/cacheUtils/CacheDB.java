@@ -19,7 +19,7 @@ abstract public class CacheDB extends RoomDatabase {
                         context.getApplicationContext(),
                         CacheDB.class,
                         "Cache_DB"
-                ).allowMainThreadQueries().build(); // allow main thread queries is dangerous fix later
+                ).allowMainThreadQueries().build(); // allowing main thread queries is probably a bad idea but it SHOULD be fine for now.
             }
         }
         return INSTANCE;

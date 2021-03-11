@@ -23,6 +23,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.cm20257.frontend.R;
 import com.cm20257.frontend.UserHandler;
@@ -34,21 +35,20 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ViewFood extends Fragment implements FoodRcyAdapter.OnItemListener {
 
+    private FoodViewModel vm;
     RecyclerView foodRecycler;
     FoodRcyAdapter adapter;
-    private FoodViewModel vm;
-//    LinkedList foodList = new LinkedList();
-
-    int[] selectedPositions = new int[] {9999};
-    int selectedIndex = 0;
-
     View view;
+
+    private final List<Integer> foodSelected = Collections.emptyList();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,7 +79,6 @@ public class ViewFood extends Fragment implements FoodRcyAdapter.OnItemListener 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
-        //listTest(view);
 
         foodRecycler = view.findViewById(R.id.foodRecycler);
         adapter = new FoodRcyAdapter(getActivity(), this);
@@ -97,21 +96,13 @@ public class ViewFood extends Fragment implements FoodRcyAdapter.OnItemListener 
 
         view.findViewById(R.id.deleteBtn).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) { // TODO improve the deletion code
-                if(selectedPositions[0] == 9999){
-                    Toast toast = Toast.makeText(getContext(), "Select Items to Delete", Toast.LENGTH_SHORT);
-                    toast.show();
-                } else { // delete all selected items
-                    //MainActivity.foodList.remove(selectedPositions);
-                    for (int selectedPosition : selectedPositions) {
-                        vm.remove(vm.allFoods.getValue().get(selectedPosition));
-                    }
-                    //updateRecycler(MainActivity.foodList.get(), view);
-                    selectedPositions = new int[]{9999};
-                    selectedIndex = 0;
+            public void onClick(View v) {
+                try {
+                    removeSelectedItems();
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
 
-                // TODO add code to delete a food item from the server
             }
         });
 
@@ -123,59 +114,52 @@ public class ViewFood extends Fragment implements FoodRcyAdapter.OnItemListener 
         });
         vm = new ViewModelProvider(this).get(FoodViewModel.class);
         vm.allFoods.observe(getViewLifecycleOwner(), obs);
+
+        refreshFood();
     }
 
+    public void removeSelectedItems() throws JSONException { // remove all items that have been checked
+        String deleteUrl = "http://192.168.1.16:8080/account/delete-food";
+        RequestQueue queue = Volley.newRequestQueue(getActivity());
 
-    public void removeItemFromSelected(int position){
-        for(int i=0; i<selectedPositions.length; i++){
-            if(selectedPositions[i] == position){
-                if (i > 0) {
-                    System.arraycopy(selectedPositions, i, selectedPositions, i - 1, selectedPositions.length - i);
-                } else {
-                    selectedPositions[i] = 9999;
+        for (int i : foodSelected) {
+            JSONObject foodToDelete = new JSONObject();
+            foodToDelete.put("id", i);
+
+            JsonObjectRequest delRequest = new JsonObjectRequest(Request.Method.POST, deleteUrl, foodToDelete, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+
                 }
-            }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    error.printStackTrace();
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() { // this is for putting headers in the request
+                    Map<String, String> params = new HashMap<>();
+                    params.put("Content-Type", "application/json");
+                    params.put("token", UserHandler.getToken());
+                    return params;
+                }
+            };
+            queue.add(delRequest);
         }
-        selectedIndex--;
-    }
 
-    public void addItemToSelected(int position){
-        //check if the index to add this index is in the array
-        if (selectedIndex < selectedPositions.length) {
-            selectedPositions[selectedIndex] = position;
-        } else {
-            //if not double the length of the selectedPositions array
-            int[] temp = new int[1 + selectedPositions.length];
-            System.arraycopy(selectedPositions, 0, temp, 0, selectedPositions.length);
-            selectedPositions = temp;
-            selectedPositions[selectedIndex] = position;
-        }
-        selectedIndex++;
+        refreshFood();
+        foodSelected.clear();
     }
 
     @Override
     public void onItemClick(int position) {
-        //what to do now you have clicked food item
-        Log.d("ONCLICKXXX", Integer.toString(position));
 
-        int duplicate = 0;
-        for (int selectedPosition : selectedPositions) {
-            if (selectedPosition == position) {
-                duplicate = 1;
-                break;
-            }
-        }
-
-        //if this is not a duplicate, add to the array
-        if(duplicate == 0) {
-            addItemToSelected(position);
-        } else {
-            //otherwise remove the original
-            removeItemFromSelected(position);
-        }
     }
 
     public void refreshFood() {
+        vm.deleteAll(); // Maybe dangerous? temp fix for getting rid of garbage entries until I think of something better.
+
         String getFoodUrl = "http://192.168.1.16:8080/account/food";
         RequestQueue queue = Volley.newRequestQueue(getActivity());
 
@@ -187,7 +171,7 @@ public class ViewFood extends Fragment implements FoodRcyAdapter.OnItemListener 
                     SimpleDateFormat jsonDF = new SimpleDateFormat("dd-MM-yy");
                     try {
                         handled = response.getJSONObject(i);
-                        long date = jsonDF.parse(handled.getString("expiryDate")).getTime();
+                        long date = Objects.requireNonNull(jsonDF.parse(handled.getString("expiryDate"))).getTime();
                         Food toAdd = new Food();
                         toAdd.uid = handled.getInt("id");
                         toAdd.foodName = handled.getString("name");
