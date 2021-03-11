@@ -41,14 +41,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class ViewFood extends Fragment implements FoodRcyAdapter.OnItemListener {
+public class ViewFood extends Fragment{
 
     private FoodViewModel vm;
     RecyclerView foodRecycler;
     FoodRcyAdapter adapter;
     View view;
-
-    private final List<Integer> foodSelected = Collections.emptyList();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,7 +79,7 @@ public class ViewFood extends Fragment implements FoodRcyAdapter.OnItemListener 
         this.view = view;
 
         foodRecycler = view.findViewById(R.id.foodRecycler);
-        adapter = new FoodRcyAdapter(getActivity(), this);
+        adapter = new FoodRcyAdapter(getActivity());
         foodRecycler.setAdapter(adapter);
         foodRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         foodRecycler.addItemDecoration(new DividerItemDecoration(foodRecycler.getContext(), DividerItemDecoration.VERTICAL));
@@ -119,42 +117,36 @@ public class ViewFood extends Fragment implements FoodRcyAdapter.OnItemListener 
     }
 
     public void removeSelectedItems() throws JSONException { // remove all items that have been checked
-        String deleteUrl = "http://192.168.1.16:8080/account/delete-food";
+        String deleteUrl = "http://192.168.1.16:8080/account/delete-food"; // TODO this code doesn't work yet. DON'T CALL IT!
         RequestQueue queue = Volley.newRequestQueue(getActivity());
 
-        for (int i : foodSelected) {
-            JSONObject foodToDelete = new JSONObject();
-            foodToDelete.put("id", i);
+        FoodRcyAdapter.MyViewHolder hold = (FoodRcyAdapter.MyViewHolder) foodRecycler.findViewHolderForAdapterPosition(7);
 
-            JsonObjectRequest delRequest = new JsonObjectRequest(Request.Method.POST, deleteUrl, foodToDelete, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
+        JSONObject foodToDelete = new JSONObject();
+        assert hold != null;
+        foodToDelete.put("id", hold.id);
 
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    error.printStackTrace();
-                }
-            }) {
-                @Override
-                public Map<String, String> getHeaders() { // this is for putting headers in the request
-                    Map<String, String> params = new HashMap<>();
-                    params.put("Content-Type", "application/json");
-                    params.put("token", UserHandler.getToken());
-                    return params;
-                }
-            };
-            queue.add(delRequest);
-        }
+        JsonObjectRequest delRequest = new JsonObjectRequest(Request.Method.POST, deleteUrl, foodToDelete, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
 
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() { // this is for putting headers in the request
+                Map<String, String> params = new HashMap<>();
+                params.put("Content-Type", "application/json");
+                params.put("token", UserHandler.getToken());
+                return params;
+            }
+        };
+        queue.add(delRequest);
         refreshFood();
-        foodSelected.clear();
-    }
-
-    @Override
-    public void onItemClick(int position) {
-
     }
 
     public void refreshFood() {

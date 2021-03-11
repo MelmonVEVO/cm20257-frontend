@@ -7,10 +7,14 @@
     tools:context=".mainPage.MainActivity">
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/textWelcome"
         android:layout_width="333dp"
-        android:layout_height="12dp"
-        android:text="Temporary layout. Remind me to improve."
+        android:layout_height="0dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/placeholder"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -18,8 +22,40 @@
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:layout_marginRight="32dp"
         android:onClick="goToFoodScreen"
-        android:text="go to the food list"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+        android:text="@string/allFoods"
+        app:layout_constraintBottom_toBottomOf="@+id/button2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/button2" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginBottom="128dp"
+        android:text="@string/allRecipes"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textFlavour"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/flavour"
+        app:layout_constraintStart_toStartOf="@+id/textWelcome"
+        app:layout_constraintTop_toBottomOf="@+id/textWelcome" />
+
+    <TextView
+        android:id="@+id/textToken"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/placeholder"
+        app:layout_constraintStart_toStartOf="@+id/textWelcome"
+        app:layout_constraintTop_toBottomOf="@+id/textFlavour" />
 </androidx.constraintlayout.widget.ConstraintLayout>

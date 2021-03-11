@@ -25,32 +25,29 @@ public class FoodRcyAdapter extends RecyclerView.Adapter<FoodRcyAdapter.MyViewHo
     Context context;
 
 
-    public int selectedItem;
-
-    private final OnItemListener onItemListener;
-
-    public FoodRcyAdapter(Context ct, OnItemListener onItemListener){
+    public FoodRcyAdapter(Context ct){
         context = ct;
-        this.onItemListener = onItemListener;
-        selectedItem = -1;
     }
 
     @NonNull
     @Override
     public FoodRcyAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // Invoked by the layout manager to create new views
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.fooditem, parent, false);
-        return new MyViewHolder(view, onItemListener);
+        return new MyViewHolder(view);
     }
 
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull FoodRcyAdapter.MyViewHolder holder, int position) {
+        // Fills the contents of a view with data
         DateFormat df = DateFormat.getDateInstance();
         Food current = cache.get(position);
         holder.foodNameText.setText(current.foodName);
         holder.foodQuantityText.setText(current.quantity + " " + current.quantityUnit);
         holder.foodDateText.setText(df.format(current.expiration));
+        holder.id = current.uid;
     }
 
     @Override
@@ -63,40 +60,20 @@ public class FoodRcyAdapter extends RecyclerView.Adapter<FoodRcyAdapter.MyViewHo
         notifyDataSetChanged();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class MyViewHolder extends RecyclerView.ViewHolder {
+        // Layout to class
         TextView foodNameText;
         TextView foodQuantityText;
         TextView foodDateText;
         CheckBox selectedCheck;
-        OnItemListener onItemListener;
+        public int id;
 
-        public MyViewHolder(@NonNull View itemView, OnItemListener onItemListener) {
+        public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             foodNameText = itemView.findViewById(R.id.foodText);
             foodQuantityText = itemView.findViewById(R.id.quantityText);
             foodDateText = itemView.findViewById(R.id.dateText);
             selectedCheck = itemView.findViewById(R.id.selectedCheck);
-
-            this.onItemListener = onItemListener;
-            itemView.setOnClickListener(this);
-        }
-
-        @SuppressLint("ResourceAsColor")
-        @Override
-        public void onClick(View v) {
-            // This inverts the checkbox when a food item is clicked.
-            selectedCheck = itemView.findViewById(R.id.selectedCheck);
-            if(selectedCheck.getVisibility() != View.GONE) {
-                selectedCheck.setChecked(!selectedCheck.isChecked());
-            }
-
-            selectedItem = getAdapterPosition();
-            onItemListener.onItemClick(getAdapterPosition());
         }
     }
-
-    public interface OnItemListener{
-        void onItemClick(int position);
-    }
-
 }
