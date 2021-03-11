@@ -9,10 +9,8 @@ import android.widget.TextView;
 
 import com.cm20257.frontend.R;
 import com.cm20257.frontend.UserHandler;
-import com.cm20257.frontend.foodList.AddFood;
 import com.cm20257.frontend.foodList.MainFoodActivity;
-
-import org.w3c.dom.Text;
+import com.cm20257.frontend.recipePage.viewRecipes;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -32,4 +30,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainFoodActivity.class);
         startActivity(intent);
     }
+
+    public void goToRecipes(View v) {
+        Intent intent = new Intent(this, viewRecipes.class);
+        startActivity(intent);
+    }
+
 }

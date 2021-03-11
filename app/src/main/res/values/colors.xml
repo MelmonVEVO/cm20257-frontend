@@ -8,4 +8,6 @@
     <color name="blue">#0C73AB</color>
     <color name="navy">#1029C9</color>
     <color name="light_grey">#BFBFBF</color>
+    <color name="backgroundColour">#2E2E2E</color>
+
 </resources>

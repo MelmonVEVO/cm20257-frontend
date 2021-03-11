@@ -67,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
             loginBtn.setEnabled(false);
             registerNewBtn.setEnabled(false);
             RequestQueue queue = Volley.newRequestQueue(this);
-            String loginServerUrl = "http://192.168.1.16:8080/account/login";
+            String loginServerUrl = "http://10.0.2.2:8080/account/login";
 
             JSONObject loginDetails = new JSONObject();
             loginDetails.put("username", emailText.getText().toString());

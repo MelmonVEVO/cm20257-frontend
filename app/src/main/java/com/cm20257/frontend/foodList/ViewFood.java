@@ -117,7 +117,7 @@ public class ViewFood extends Fragment{
     }
 
     public void removeSelectedItems() throws JSONException { // remove all items that have been checked
-        String deleteUrl = "http://192.168.1.16:8080/account/delete-food"; // TODO finish deletion code
+        String deleteUrl = "http://10.0.2.2:8080/account/delete-food"; // TODO finish deletion code
         // this code doesn't work yet. DON'T CALL IT!
         RequestQueue queue = Volley.newRequestQueue(getActivity());
 

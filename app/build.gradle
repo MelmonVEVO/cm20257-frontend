@@ -9,6 +9,7 @@ android {
     defaultConfig {
         applicationId "com.cm20257.frontend"
         minSdkVersion 16
+        multiDexEnabled true
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -30,8 +31,8 @@ android {
 
 dependencies {
     // using Volley
-    implementation 'com.android.volley:volley:1.1.1'
-
+    implementation 'com.android.volley:volley:1.2.0'
+    implementation 'com.squareup.picasso:picasso:2.71828'
     implementation "androidx.fragment:fragment:1.3.0"
 
     def nav_version = "2.3.3"

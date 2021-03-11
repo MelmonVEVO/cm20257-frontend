@@ -1,6 +1,7 @@
 package com.cm20257.frontend.foodList;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,7 +106,7 @@ public class AddFood extends Fragment {
                     result.putLong("date", foodDate);
 
                     // post the data to the server
-                    String addFoodUrl = "http://192.168.1.16:8080/account/add-food";
+                    String addFoodUrl = "http://10.0.2.2:8080/account/add-food";
                     RequestQueue queue = Volley.newRequestQueue(getActivity());
 
                     SimpleDateFormat jsonDF = new SimpleDateFormat("dd-MM-yy");
@@ -116,6 +117,7 @@ public class AddFood extends Fragment {
                         foodRequestDetails.put("quantityType", unit);
                         foodRequestDetails.put("expiryDate", jsonDF.format(new Date(foodDate)));
                         //int foodID;
+                        Log.d("RESPONSE", foodRequestDetails.toString());
                         JsonObjectRequest loginRequest = new JsonObjectRequest(Request.Method.POST, addFoodUrl, foodRequestDetails, new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject response) {

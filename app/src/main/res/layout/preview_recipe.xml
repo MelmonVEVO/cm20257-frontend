@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@color/backgroundColour">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/preview_from"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="From: BBC GoodFood"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/preview_time"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_below="@+id/preview_from"
+            android:text="Time: 30 mins"
+            android:textColor="@color/white"/>
+
+        <TextView
+            android:id="@+id/preview_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/preview_from"
+            android:paddingLeft="24dp"
+            android:text="Title"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_alignParentBottom="true"/>
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>
