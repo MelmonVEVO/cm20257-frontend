@@ -33,11 +33,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -161,7 +163,7 @@ public class ViewFood extends Fragment{
             public void onResponse(JSONArray response) {
                 for (int i = 0; i < response.length(); i++) {
                     JSONObject handled;
-                    SimpleDateFormat jsonDF = new SimpleDateFormat("dd-MM-yy");
+                    DateFormat jsonDF = new SimpleDateFormat("yy-MM-dd", Locale.UK);
                     try {
                         handled = response.getJSONObject(i);
                         long date = Objects.requireNonNull(jsonDF.parse(handled.getString("expiryDate"))).getTime();

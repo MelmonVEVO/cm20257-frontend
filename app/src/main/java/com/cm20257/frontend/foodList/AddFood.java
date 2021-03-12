@@ -109,13 +109,13 @@ public class AddFood extends Fragment {
                     String addFoodUrl = "http://10.0.2.2:8080/account/add-food";
                     RequestQueue queue = Volley.newRequestQueue(getActivity());
 
-                    SimpleDateFormat jsonDF = new SimpleDateFormat("dd-MM-yy");
+                    SimpleDateFormat jsonDF = new SimpleDateFormat("yyyy-MM-dd", Locale.UK);
                     JSONObject foodRequestDetails = new JSONObject();
                     try {
                         foodRequestDetails.put("name", foodName);
                         foodRequestDetails.put("quantity", foodQuantity);
                         foodRequestDetails.put("quantityType", unit);
-                        foodRequestDetails.put("expiryDate", jsonDF.format(new Date(foodDate)));
+                        foodRequestDetails.put("expiryDate", jsonDF.format(new Date(foodDate))); // convert long date to new string
                         //int foodID;
                         Log.d("RESPONSE", foodRequestDetails.toString());
                         JsonObjectRequest loginRequest = new JsonObjectRequest(Request.Method.POST, addFoodUrl, foodRequestDetails, new Response.Listener<JSONObject>() {
