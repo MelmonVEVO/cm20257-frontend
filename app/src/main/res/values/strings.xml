@@ -15,7 +15,7 @@
 
     <string name="app_name">Munch Manager</string>
     <string name="pleaseLogin">Please login.</string>
-    <string name="registerAcc">Register an account.</string>
+    <string name="registerAcc">Register an Account</string>
     <string name="welcome">Welcome, %s. What would you like to do today?</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
@@ -51,7 +51,7 @@
     <string name="amount">Amount:</string>
     <string name="amountHint">Amount (in selected measurement)</string>
     <string name="expiry">Expiration:</string>
-    <string name="expiryHint">YYYY/MM/DD</string>
+    <string name="expiryHint">DD/MM/YYYY</string>
     <string name="noExpiry">No Expiration</string>
     <string name="placeholder">placeholder</string>
     <string name="quantity">Quantity: %f%s</string>

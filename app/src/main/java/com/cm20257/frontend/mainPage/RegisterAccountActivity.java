@@ -109,6 +109,8 @@ public class RegisterAccountActivity extends AppCompatActivity {
         finish();
     }
 
+    public void returnToLoginPage(View view) {finish();}
+
     private void promptError() {
         Toast t = Toast.makeText(this, "An error has occurred. Perhaps a user with the same name already exists?", Toast.LENGTH_SHORT);
         t.show();

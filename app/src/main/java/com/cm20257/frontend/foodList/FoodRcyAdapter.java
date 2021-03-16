@@ -2,6 +2,7 @@ package com.cm20257.frontend.foodList;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,6 @@ public class FoodRcyAdapter extends RecyclerView.Adapter<FoodRcyAdapter.MyViewHo
     private List<Food> cache = Collections.emptyList();
     Context context;
 
-
     public FoodRcyAdapter(Context ct){
         context = ct;
     }
@@ -46,7 +46,11 @@ public class FoodRcyAdapter extends RecyclerView.Adapter<FoodRcyAdapter.MyViewHo
         Food current = cache.get(position);
         holder.foodNameText.setText(current.foodName);
         holder.foodQuantityText.setText(current.quantity + " " + current.quantityUnit);
-        holder.foodDateText.setText(df.format(current.expiration));
+        if (current.expiration < 0) {
+            holder.foodDateText.setText("No Expiry");
+        } else {
+            holder.foodDateText.setText(df.format(current.expiration));
+        }
         holder.id = current.uid;
     }
 

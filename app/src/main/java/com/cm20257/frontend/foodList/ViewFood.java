@@ -36,14 +36,15 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-public class ViewFood extends Fragment{
+public class ViewFood extends Fragment {
 
     private FoodViewModel vm;
     RecyclerView foodRecycler;
@@ -53,6 +54,7 @@ public class ViewFood extends Fragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         getParentFragmentManager().setFragmentResultListener("addRequestKey", this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
@@ -102,37 +104,61 @@ public class ViewFood extends Fragment{
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
         });
 
-        view.findViewById(R.id.refreshBtn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                refreshFood();
-            }
-        });
         vm = new ViewModelProvider(this).get(FoodViewModel.class);
         vm.allFoods.observe(getViewLifecycleOwner(), obs);
+        adapter.notifyDataSetChanged();
 
         refreshFood();
     }
 
+    public List<Integer> get_id_of_selected_food() {
+
+        List<Integer> selectedFoodsIDs = new ArrayList<>();
+
+        for (int i = 0; i < adapter.getItemCount(); i++) {
+            FoodRcyAdapter.MyViewHolder holder = (FoodRcyAdapter.MyViewHolder) foodRecycler.findViewHolderForAdapterPosition(i);
+            if (holder.selectedCheck.isChecked()) {
+                selectedFoodsIDs.add(i);
+            }
+        }
+
+        return selectedFoodsIDs;
+    }
+
     public void removeSelectedItems() throws JSONException { // remove all items that have been checked
-        String deleteUrl = "http://10.0.2.2:8080/account/delete-food"; // TODO finish deletion code
-        // this code doesn't work yet. DON'T CALL IT!
+
+        List<Integer> selected = get_id_of_selected_food();
+
+        for (int i : selected) {
+            Map<String, Integer> foodToDelete = new HashMap<String, Integer>();
+            FoodRcyAdapter.MyViewHolder hold = (FoodRcyAdapter.MyViewHolder) foodRecycler.findViewHolderForAdapterPosition(i);
+            foodToDelete.put("id", hold.id);
+
+            post_selected_items(foodToDelete);
+            vm.remove(vm.allFoods.getValue().get(hold.getAdapterPosition()));
+            adapter.notifyDataSetChanged();
+        }
+
+        if (selected.size() == 0) {
+            Toast.makeText(getContext(), "No items selected, select an item to delete", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        alert_deleted_item();
+    }
+
+    public void post_selected_items(Map<String, Integer> item_to_delete) {
+
+        String deleteUrl = "http://10.0.2.2:8080/account/delete-food";
         RequestQueue queue = Volley.newRequestQueue(getActivity());
-
-        FoodRcyAdapter.MyViewHolder hold = (FoodRcyAdapter.MyViewHolder) foodRecycler.findViewHolderForAdapterPosition(7);
-
-        JSONObject foodToDelete = new JSONObject();
-        assert hold != null;
-        foodToDelete.put("id", hold.id);
-
-        JsonObjectRequest delRequest = new JsonObjectRequest(Request.Method.POST, deleteUrl, foodToDelete, new Response.Listener<JSONObject>() {
+        JsonObjectRequest delRequest = new JsonObjectRequest(Request.Method.POST, deleteUrl, new JSONObject(item_to_delete), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-
+                System.out.println(UserHandler.getUsername());
+                Log.d("RESPONSE", response.toString());
             }
         }, new Response.ErrorListener() {
             @Override
@@ -148,14 +174,21 @@ public class ViewFood extends Fragment{
                 return params;
             }
         };
+
         queue.add(delRequest);
-        refreshFood();
     }
 
-    public void refreshFood() {
-        vm.deleteAll(); // Maybe dangerous? temp fix for getting rid of garbage entries until I think of something better.
+    public void refreshFood(){
 
-        String getFoodUrl = "http://192.168.1.16:8080/account/food";
+        vm.deleteAll();
+
+        vm = new ViewModelProvider(this).get(FoodViewModel.class);
+        vm.allFoods.observe(getViewLifecycleOwner(), obs);
+        adapter.notifyDataSetChanged();
+
+        Log.d("RESPONSE", "REFRESHED");
+
+        String getFoodUrl = "http://10.0.2.2:8080/account/food";
         RequestQueue queue = Volley.newRequestQueue(getActivity());
 
         JsonArrayRequest foodRequest = new JsonArrayRequest(Request.Method.GET, getFoodUrl, null, new Response.Listener<JSONArray>() {
@@ -163,6 +196,11 @@ public class ViewFood extends Fragment{
             public void onResponse(JSONArray response) {
                 for (int i = 0; i < response.length(); i++) {
                     JSONObject handled;
+                    try {
+                        Log.d("RESPONSE", String.valueOf(response.getJSONObject(i)));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     DateFormat jsonDF = new SimpleDateFormat("yy-MM-dd", Locale.UK);
                     try {
                         handled = response.getJSONObject(i);
@@ -174,6 +212,7 @@ public class ViewFood extends Fragment{
                         toAdd.quantityUnit = handled.getString("quantityType");
                         toAdd.expiration = date;
                         vm.insert(toAdd);
+                        adapter.notifyDataSetChanged();
                     } catch (JSONException | ParseException e) {
                         e.printStackTrace();
                     }
@@ -203,5 +242,10 @@ public class ViewFood extends Fragment{
             adapter.setFood(foods);
         }
     };
+
+    private void alert_deleted_item() {
+        Toast t = Toast.makeText(getContext(), "Deleted selected items!", Toast.LENGTH_LONG);
+        t.show();
+    }
 
 }

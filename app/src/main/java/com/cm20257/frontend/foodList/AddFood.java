@@ -64,7 +64,7 @@ public class AddFood extends Fragment {
         view.findViewById(R.id.addBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DateFormat df = new SimpleDateFormat("yyyy/MM/dd", Locale.UK);
+                DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.UK);
                 //Retrieve user input and put into array foodInfo
                 String foodName = foodNameEt.getText().toString();
                 Float foodQuantity;
@@ -117,7 +117,7 @@ public class AddFood extends Fragment {
                         foodRequestDetails.put("quantityType", unit);
                         foodRequestDetails.put("expiryDate", jsonDF.format(new Date(foodDate))); // convert long date to new string
                         //int foodID;
-                        Log.d("RESPONSE", foodRequestDetails.toString());
+                        System.out.println(UserHandler.getUsername());
                         JsonObjectRequest loginRequest = new JsonObjectRequest(Request.Method.POST, addFoodUrl, foodRequestDetails, new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject response) {

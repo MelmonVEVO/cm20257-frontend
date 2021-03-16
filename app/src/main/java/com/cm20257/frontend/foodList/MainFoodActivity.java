@@ -1,8 +1,11 @@
 package com.cm20257.frontend.foodList;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.cm20257.frontend.R;
+import com.cm20257.frontend.mainPage.MainActivity;
+import com.cm20257.frontend.recipePage.viewRecipes;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -16,8 +19,14 @@ public class MainFoodActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewfoodmain);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar3);
         setSupportActionBar(toolbar);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
     }
 
     @Override
@@ -35,8 +44,14 @@ public class MainFoodActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_recipes) {
+            Intent intent = new Intent(this, viewRecipes.class);
+            startActivity(intent);
+        }
+
+        if (item.getItemId() == android.R.id.home) {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent); // close this activity and return to preview activity (if there is any)
         }
 
         return super.onOptionsItemSelected(item);
