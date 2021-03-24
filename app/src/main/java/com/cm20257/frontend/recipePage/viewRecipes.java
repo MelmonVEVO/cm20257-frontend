@@ -2,6 +2,7 @@ package com.cm20257.frontend.recipePage;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -9,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -60,21 +62,22 @@ class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.MyHolder> {
     public void onBindViewHolder(MyHolder myHolder, int position) {
         myHolder.title.setText(recipeList.get(position).getTitle());
 
+        if (recipeList.get(position).getFavouriteID() == -1) {
+            myHolder.favourite.setText("");
+        } else {
+            myHolder.favourite.setText("Favourite");
+        }
+
         String time = "Time: " + recipeList.get(position).getTime();
         myHolder.time.setText(time);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
     }
 
     @Override
-    public int getItemCount() {
-        return recipeList.size();
-    }
+    public int getItemCount() { return recipeList.size(); }
 
     public static class MyHolder extends  RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView time, title;
+        TextView time, title, favourite;
         OnClickListener onClickListener;
 
         public MyHolder(@NonNull View itemView, OnClickListener onClickListener) {
@@ -82,6 +85,7 @@ class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.MyHolder> {
             this.time = itemView.findViewById(R.id.preview_time);
             this.title = itemView.findViewById(R.id.preview_title);
             this.onClickListener = onClickListener;
+            this.favourite = itemView.findViewById(R.id.favouriteTag);
 
             itemView.setOnClickListener(this);
         }
@@ -90,6 +94,12 @@ class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.MyHolder> {
         public void onClick(View v) {
             onClickListener.onClick(getAdapterPosition());
         }
+    }
+
+    public void updateList(List<Recipe> recipeList) {
+        this.recipeList.clear();
+        this.recipeList = recipeList;
+        notifyDataSetChanged();
     }
 
     public interface OnClickListener {
@@ -101,13 +111,15 @@ public class viewRecipes extends AppCompatActivity implements RecipeAdapter.OnCl
 
     private RecyclerView recyclerView;
     private RecipeAdapter adapter;
-    private List<Recipe> recipeList;
+    public List<Recipe> adapterList;
+    public static List<Recipe> recipeList;
+    public static List<Recipe> favouritesList;
     private List<String> foodList;
 
     @Override
     public void onClick(int position) {
         Intent intent = new Intent(this, IndividualRecipe.class);
-        intent.putExtra("recipe", recipeList.get(position));
+        intent.putExtra("recipe", adapterList.get(position));
         startActivity(intent);
     }
 
@@ -142,13 +154,14 @@ public class viewRecipes extends AppCompatActivity implements RecipeAdapter.OnCl
                 get_all_recipes(UserHandler.getToken(), result, new VolleyCallbackRecipe() {
                     @Override
                     public void onSuccessResponse(List<Recipe> result) {
-                        adapter = new RecipeAdapter(getApplicationContext(), result, viewRecipes.this);
+                        adapterList = new ArrayList<>(result);
+                        get_favourite_recipes(UserHandler.getToken());
+                        adapter = new RecipeAdapter(getApplicationContext(), adapterList, viewRecipes.this);
                         recyclerView.setAdapter(adapter);
                         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                         adapter.notifyDataSetChanged();
                     }
                 });
-
             }
         });
     }
@@ -156,31 +169,97 @@ public class viewRecipes extends AppCompatActivity implements RecipeAdapter.OnCl
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main_and_favourite, menu);
         return true;
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_food_items) {
             Intent intent = new Intent(this, MainFoodActivity.class);
             startActivity(intent);
         }
 
+        if (id == R.id.action_get_favourites) {
+            if (item.getTitle().equals("Show Favourite Recipes")) {
+                if (favouritesList.size() == 0) {
+                    Toast.makeText(this, "You haven't set any recipes as favourite", Toast.LENGTH_LONG).show();
+                    return super.onOptionsItemSelected(item);
+                }
+                adapterList = new ArrayList<>(favouritesList);
+                adapter.updateList(adapterList);
+                recyclerView.setAdapter(adapter);
+                item.setTitle("Show All Recipes");
+            } else {
+                adapterList = new ArrayList<>(recipeList);
+                adapter.updateList(adapterList);
+                recyclerView.setAdapter(adapter);
+                item.setTitle("Show Favourite Recipes");
+            }
+        }
 
         if (item.getItemId() == android.R.id.home) {
             Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent); // close this activity and return to preview activity (if there is any)
+            startActivity(intent); // close this activity and return to previous activity
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void get_favourite_recipes(String authentication) {
+
+        RequestQueue queue = Volley.newRequestQueue(viewRecipes.this);
+        String url = "http://10.0.2.2:8080/account/favourites";
+
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                List<Recipe> food_favourites = new ArrayList<>();
+                favouritesList = new ArrayList<>();
+
+                for (int i = 0; i < response.length(); i++) {
+
+                    try {
+                        JSONObject object = response.getJSONObject(i);
+                        Recipe newRecipe = new Recipe(object.getInt("id"), -1, object.getString("title"),
+                                object.getString("time"), "",
+                                object.getString("imageUrl"), object.getString("url"));
+
+                        food_favourites.add(newRecipe);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                for (int i = 0; i < recipeList.size(); i++) {
+                    for (int j = 0; j < food_favourites.size(); j++) {
+                        if (recipeList.get(i).getTitle().equals(food_favourites.get(j).getTitle())) {
+                            recipeList.get(i).setFavouriteID(food_favourites.get(j).getId());
+                            favouritesList.add(recipeList.get(i));
+                            break;
+                        }
+                    }
+                }
+
+                adapter.notifyDataSetChanged();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", authentication);
+                return params;
+            }
+        };
+
+        queue.add(jsonArrayRequest);
     }
 
     public void get_all_recipes(String authentication, List<String> food_names, VolleyCallbackRecipe callback) {
@@ -203,7 +282,7 @@ public class viewRecipes extends AppCompatActivity implements RecipeAdapter.OnCl
 
                         for (String name : food_names) {
                             if (listOfIngredients.contains(name) || listOfIngredients.toUpperCase().contains(name.toUpperCase())) {
-                                Recipe newRecipe = new Recipe(object.getInt("id"), object.getString("title"),
+                                Recipe newRecipe = new Recipe(object.getInt("id"), -1, object.getString("title"),
                                         object.getString("time"), listOfIngredients,
                                         object.getString("imageUrl"), object.getString("url"));
 
@@ -261,7 +340,7 @@ public class viewRecipes extends AppCompatActivity implements RecipeAdapter.OnCl
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
             }
-        }){
+        }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
@@ -272,10 +351,4 @@ public class viewRecipes extends AppCompatActivity implements RecipeAdapter.OnCl
 
         queue.add(jsonArrayRequest);
     }
-
-    public void goToMainMenu(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-    }
-
 }

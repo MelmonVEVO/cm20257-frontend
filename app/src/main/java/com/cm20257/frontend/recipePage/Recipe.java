@@ -5,11 +5,12 @@ import android.os.Parcelable;
 
 public class Recipe implements Parcelable {
 
-    private int id;
+    private int id, favouriteID;
     private String title, time, ingredients, imgURL, url;
 
-    public Recipe(int id, String title, String time, String ingredients, String imgURL, String url) {
+    public Recipe(int id, int favouriteID, String title, String time, String ingredients, String imgURL, String url) {
         this.id = id;
+        this.favouriteID = favouriteID;
         this.title = title;
         this.time = time;
         this.ingredients = ingredients;
@@ -19,6 +20,7 @@ public class Recipe implements Parcelable {
 
     protected Recipe(Parcel in) {
         id = in.readInt();
+        favouriteID = in.readInt();
         title = in.readString();
         time = in.readString();
         ingredients = in.readString();
@@ -86,8 +88,12 @@ public class Recipe implements Parcelable {
         this.url = url;
     }
 
+    public int getFavouriteID() { return favouriteID; }
+
+    public void setFavouriteID(int favouriteID) { this.favouriteID = favouriteID; }
+
     public String returnAll() {
-        return this.id + " " + this.title + " "  + this.time + " "  + this.ingredients + " "  + this.imgURL + " "  + this.url + " " ;
+        return getId() + ", " + getFavouriteID() + ", " + getTitle();
     }
 
     @Override
@@ -98,6 +104,7 @@ public class Recipe implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
+        dest.writeInt(favouriteID);
         dest.writeString(title);
         dest.writeString(time);
         dest.writeString(ingredients);

@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.cm20257_addfood4.MainActivity">
+    <item
+        android:id="@+id/action_food_items"
+        android:orderInCategory="100"
+        android:title="Your Food Items"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_recipes"
+        android:orderInCategory="100"
+        android:title="Recipes"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_get_favourites"
+        android:orderInCategory="100"
+        android:title="Show Favourite Recipes"
+        app:showAsAction="never" />
+</menu>

@@ -10,16 +10,37 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.cm20257.frontend.R;
+import com.cm20257.frontend.UserHandler;
 import com.cm20257.frontend.foodList.MainFoodActivity;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class IndividualRecipe extends AppCompatActivity {
+
+    private Recipe recipe;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,7 +56,7 @@ public class IndividualRecipe extends AppCompatActivity {
         }
 
         Intent intent = getIntent();
-        Recipe recipe = intent.getParcelableExtra("recipe");
+        recipe = intent.getParcelableExtra("recipe");
 
         // Displays image of individual recipe.
         TextView title = findViewById(R.id.recipeTitle);
@@ -65,26 +86,14 @@ public class IndividualRecipe extends AppCompatActivity {
                 startActivity(urlClick);
             }
         });
-
-//        // Displays image of individual recipe.
-//        Button button = findViewById(R.id.backButton);
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(IndividualRecipe.this, viewRecipes.class);
-//                startActivity(intent);
-//            }
-//        });
-
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main_and_add_favourite, menu);
         return true;
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -98,16 +107,119 @@ public class IndividualRecipe extends AppCompatActivity {
             finish();
         }
 
+        if (id == R.id.action_add_favourites) {
+            if (recipe.getFavouriteID() == -1) {
+                add_favourite();
+            } else {
+                deleteFavourite();
+                for (int i = 0; i < viewRecipes.recipeList.size(); i++) {
+                    if (recipe.getId() == viewRecipes.recipeList.get(i).getId()) {
+                        recipe.setFavouriteID(-1);
+                        viewRecipes.recipeList.get(i).setFavouriteID(-1);
+                        Toast.makeText(getApplicationContext(), recipe.getTitle() + " has been removed from favourites", Toast.LENGTH_LONG).show();
+                        break;
+                    }
+                }
+            }
+            invalidateOptionsMenu();
+        }
+
         if (id == R.id.action_food_items) {
             Intent intent = new Intent(this, MainFoodActivity.class);
             startActivity(intent);
         }
 
         if (item.getItemId() == android.R.id.home) {
-            finish(); // close this activity and return to preview activity (if there is any)
+            startActivity(new Intent(this, viewRecipes.class));
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void add_favourite() {
+        String URL = "http://10.0.2.2:8080/account/add-favourite";
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        Map<String, Integer> item_to_add = new HashMap<>();
+        item_to_add.put("recipe", recipe.getId());
+
+        JsonObjectRequest addRequest = new JsonObjectRequest(Request.Method.POST, URL, new JSONObject(item_to_add), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                for (int i = 0; i < viewRecipes.recipeList.size(); i++) {
+                    if (recipe.getId() == viewRecipes.recipeList.get(i).getId()) {
+                        try {
+                            recipe.setFavouriteID(response.getInt("favourite"));
+                            viewRecipes.recipeList.get(i).setFavouriteID(response.getInt("favourite"));
+
+                            Toast.makeText(getApplicationContext(), recipe.getTitle() + " has been added to favourites", Toast.LENGTH_LONG).show();
+                            return;
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() { // this is for putting headers in the request
+                Map<String, String> params = new HashMap<>();
+                params.put("Content-Type", "application/json");
+                params.put("token", UserHandler.getToken());
+                return params;
+            }
+        };
+
+        queue.add(addRequest);
+    }
+
+    public void deleteFavourite() {
+
+        String URL = "http://10.0.2.2:8080/account/delete-favourite";
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        Map<String, Integer> item_to_add = new HashMap<>();
+        item_to_add.put("favourite", recipe.getFavouriteID());
+
+        JsonObjectRequest addRequest = new JsonObjectRequest(Request.Method.POST, URL, new JSONObject(item_to_add), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() { // this is for putting headers in the request
+                Map<String, String> params = new HashMap<>();
+                params.put("Content-Type", "application/json");
+                params.put("token", UserHandler.getToken());
+                return params;
+            }
+        };
+
+        queue.add(addRequest);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.findItem(R.id.action_add_favourites);
+
+        if (recipe.getFavouriteID() != -1) {
+            item.setTitle("Remove from Favourites");
+        } else {
+            item.setTitle("Add to Favourites");
+        }
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
 }

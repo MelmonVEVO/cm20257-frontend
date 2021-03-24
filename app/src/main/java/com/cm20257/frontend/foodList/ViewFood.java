@@ -99,11 +99,7 @@ public class ViewFood extends Fragment {
         view.findViewById(R.id.deleteBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    removeSelectedItems();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                removeSelectedItems();
             }
         });
 
@@ -115,9 +111,7 @@ public class ViewFood extends Fragment {
     }
 
     public List<Integer> get_id_of_selected_food() {
-
         List<Integer> selectedFoodsIDs = new ArrayList<>();
-
         for (int i = 0; i < adapter.getItemCount(); i++) {
             FoodRcyAdapter.MyViewHolder holder = (FoodRcyAdapter.MyViewHolder) foodRecycler.findViewHolderForAdapterPosition(i);
             if (holder.selectedCheck.isChecked()) {
@@ -128,7 +122,7 @@ public class ViewFood extends Fragment {
         return selectedFoodsIDs;
     }
 
-    public void removeSelectedItems() throws JSONException { // remove all items that have been checked
+    public void removeSelectedItems() { // remove all items that have been checked
 
         List<Integer> selected = get_id_of_selected_food();
 
@@ -157,8 +151,7 @@ public class ViewFood extends Fragment {
         JsonObjectRequest delRequest = new JsonObjectRequest(Request.Method.POST, deleteUrl, new JSONObject(item_to_delete), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                System.out.println(UserHandler.getUsername());
-                Log.d("RESPONSE", response.toString());
+                System.out.println("DELETED ITEM");
             }
         }, new Response.ErrorListener() {
             @Override
@@ -185,8 +178,6 @@ public class ViewFood extends Fragment {
         vm = new ViewModelProvider(this).get(FoodViewModel.class);
         vm.allFoods.observe(getViewLifecycleOwner(), obs);
         adapter.notifyDataSetChanged();
-
-        Log.d("RESPONSE", "REFRESHED");
 
         String getFoodUrl = "http://10.0.2.2:8080/account/food";
         RequestQueue queue = Volley.newRequestQueue(getActivity());
